@@ -1,13 +1,14 @@
 {
   "name": "readme-skills",
-  "version": "0.0.1",
-  "description": "Install the readme-updater and readme-generator skills",
+  "version": "0.0.2",
+  "description": "Install readme-updater and readme-generator into .agents/skills as Markdown files",
   "keywords": [
     "skills",
-    "editor",
-    "ide",
+    "agents",
     "readme",
-    "automation"
+    "github",
+    "installer",
+    "npx"
   ],
   "homepage": "https://github.com/ParthRana1023/readme-skills#readme",
   "bugs": {
@@ -17,12 +18,17 @@
     "type": "git",
     "url": "git+https://github.com/ParthRana1023/readme-skills.git"
   },
+  "license": "MIT",
   "bin": {
     "readme-skills": "./bin/cli.js"
   },
   "files": [
     "bin",
-    "skills"
+    "skills",
+    "README.md",
+    "LICENSE"
   ],
-  "license": "MIT"
+  "dependencies": {
+    "adm-zip": "^0.5.16"
+  }
 }

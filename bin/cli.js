@@ -1,45 +1,88 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const childProcess = require("child_process");
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const AdmZip = require('adm-zip');
 
 const SKILLS = [
-  { file: "readme-updater.skill", name: "readme-updater" },
-  { file: "readme-generator.skill", name: "readme-generator" },
+  {
+    archive: 'readme-updater.skill',
+    output: 'readme-updater.md',
+  },
+  {
+    archive: 'readme-generator.skill',
+    output: 'readme-generator.md',
+  },
 ];
 
-// Change this to the folder your editor/IDE expects.
-const targetBase = process.argv[2] || path.join(process.cwd(), ".skills");
+function parseArgs(argv) {
+  const args = { target: null, help: false };
+  for (let i = 2; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === '-h' || a === '--help') args.help = true;
+    else if (a === '-t' || a === '--target') {
+      args.target = argv[i + 1];
+      i++;
+    } else if (!args.target && !a.startsWith('-')) {
+      args.target = a;
+    }
+  }
+  return args;
+}
 
-function extractSkillArchive(archivePath, destDir) {
-  fs.mkdirSync(destDir, { recursive: true });
+function usage() {
+  console.log(`readme-skills\n\nUsage:\n  npx readme-skills [target-directory]\n  npx readme-skills --target <directory>\n\nDefault target:\n  ./.agents/skills\n`);
+}
 
-  // Uses system unzip. Works on most macOS/Linux environments.
-  // For cross-platform packaging, swap this for a JS zip library.
-  childProcess.execFileSync("unzip", ["-o", archivePath, "-d", destDir], {
-    stdio: "inherit",
-  });
+function findSkillMd(zip) {
+  const entries = zip.getEntries();
+  const entry = entries.find((e) => e.entryName.endsWith('SKILL.md'));
+  if (!entry) return null;
+  return { entry, content: zip.readAsText(entry, 'utf8') };
+}
+
+function ensureDir(dir) {
+  fs.mkdirSync(dir, { recursive: true });
 }
 
 function main() {
-  const skillsDir = path.join(__dirname, "..", "skills");
-
-  for (const skill of SKILLS) {
-    const archivePath = path.join(skillsDir, skill.file);
-    const installDir = path.join(targetBase, skill.name);
-
-    if (!fs.existsSync(archivePath)) {
-      console.error(`Missing skill archive: ${skill.file}`);
-      process.exit(1);
-    }
-
-    console.log(`Installing ${skill.name}...`);
-    extractSkillArchive(archivePath, installDir);
+  const args = parseArgs(process.argv);
+  if (args.help) {
+    usage();
+    process.exit(0);
   }
 
-  console.log(`Done. Installed skills to: ${targetBase}`);
+  const targetRoot = path.resolve(
+    args.target || path.join(process.cwd(), '.agents', 'skills')
+  );
+  const skillsDir = path.join(__dirname, '..', 'skills');
+
+  ensureDir(targetRoot);
+
+  for (const skill of SKILLS) {
+    const archivePath = path.join(skillsDir, skill.archive);
+    if (!fs.existsSync(archivePath)) {
+      throw new Error(`Missing bundled archive: ${skill.archive}`);
+    }
+
+    const zip = new AdmZip(archivePath);
+    const found = findSkillMd(zip);
+    if (!found) {
+      throw new Error(`No SKILL.md found inside ${skill.archive}`);
+    }
+
+    const destPath = path.join(targetRoot, skill.output);
+    fs.writeFileSync(destPath, found.content, 'utf8');
+    console.log(`Installed ${skill.output} -> ${destPath}`);
+  }
+
+  console.log(`\nDone. Skills installed in ${targetRoot}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(`\nError: ${error.message}`);
+  process.exit(1);
+}
