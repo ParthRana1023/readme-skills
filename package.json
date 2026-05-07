@@ -1,0 +1,28 @@
+{
+  "name": "readme-skills",
+  "version": "0.0.1",
+  "description": "Install the readme-updater and readme-generator skills",
+  "keywords": [
+    "skills",
+    "editor",
+    "ide",
+    "readme",
+    "automation"
+  ],
+  "homepage": "https://github.com/ParthRana1023/readme-skills#readme",
+  "bugs": {
+    "url": "https://github.com/ParthRana1023/readme-skills/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ParthRana1023/readme-skills.git"
+  },
+  "bin": {
+    "readme-skills": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "skills"
+  ],
+  "license": "MIT"
+}
