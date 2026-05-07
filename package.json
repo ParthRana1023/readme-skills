@@ -1,6 +1,6 @@
 {
   "name": "readme-skills",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Install readme-updater and readme-generator into .agents/skills as Markdown files",
   "keywords": [
     "skills",
@@ -20,7 +20,7 @@
   },
   "license": "MIT",
   "bin": {
-    "readme-skills": "./bin/cli.js"
+    "readme-skills": "bin/cli.js"
   },
   "files": [
     "bin",
