@@ -1,6 +1,6 @@
 {
   "name": "readme-skills",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Install readme-updater and readme-generator into .agents/skills as Markdown files",
   "keywords": [
     "skills",
